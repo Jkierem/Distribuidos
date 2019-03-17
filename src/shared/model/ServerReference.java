@@ -36,4 +36,15 @@ public class ServerReference {
 		return this.address + "," + String.valueOf(this.port);
 	}
 	
+	public boolean equals( ServerReference other ) {
+		return other.address.compareTo(this.address) == 0 && other.port == this.port;
+	}
+	
+	public static ServerReference empty() {
+		return new ServerReference("",-1);
+	}
+	
+	public boolean isNullRef() {
+		return this.equals(ServerReference.empty());
+	}
 }

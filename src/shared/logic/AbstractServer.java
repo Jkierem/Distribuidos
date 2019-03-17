@@ -7,25 +7,22 @@ import java.net.Socket;
 import shared.utils.ConditionalLogger;
 
 public abstract class AbstractServer extends Thread {
-	private String name;
+	
 	private int port;
-	private boolean open;
-	private ConditionalLogger logger;
+	private volatile boolean open;
+	protected ConditionalLogger logger;
 	
 	public AbstractServer( String name , int port) {
-		this.name = name;
 		this.port = port;
 		this.open = true;
 		this.logger = new ConditionalLogger(true);
 	}
 	
 	public AbstractServer( String name , int port , boolean verbose ) {
-		this.name = name;
 		this.port = port;
 		this.open = true;
-		this.logger = new ConditionalLogger(verbose);
+		this.logger = new ConditionalLogger(verbose, name + ": ");
 	}
-	
 	
 	@Override
 	public void run() {
@@ -33,9 +30,9 @@ public abstract class AbstractServer extends Thread {
 		try {
 			server = new ServerSocket(this.port);
 			while(this.open) {
-				this.logger.log(name + ": Waiting for connections...");
+				this.logger.log("Waiting for connections...");
 				Socket socket = server.accept();
-				this.logger.log(name + ": Got connection! About to communicate");
+				this.logger.log("Got connection! About to communicate");
 				this.onRequest(socket);
 			}
 		} catch (IOException e) {

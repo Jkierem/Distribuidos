@@ -1,18 +1,18 @@
-package dns.services;
+package dpd.services;
 
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 
-import dns.connection.ClientConnection;
+import dpd.connection.ClientConnection;
 import shared.model.ServerReference;
 
-public class DNSService<Container extends BlockingQueue<ServerReference> > extends AbstractDNSService<ClientConnection<Container>,Container>{
+public class DPDService<Container extends BlockingQueue<ServerReference> > extends AbstractDPDServer<ClientConnection<Container>,Container>{
 	
-	public DNSService( String name, int port, Container proxyList) {
+	public DPDService( String name, int port, Container proxyList) {
 		super( name, port, proxyList );
 	}
 	
-	public DNSService( String name ,int port, Container proxyList, boolean verbose) {
+	public DPDService( String name ,int port, Container proxyList, boolean verbose) {
 		super( name, port, proxyList, verbose );
 	}
 	

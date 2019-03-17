@@ -7,7 +7,7 @@ import java.net.Socket;
 
 public abstract class AbstractConnection extends Thread {
 	private Socket socket;
-	private boolean open;
+	private volatile boolean open;
 	
 	public AbstractConnection( Socket socket ) {
 		this.socket = socket;

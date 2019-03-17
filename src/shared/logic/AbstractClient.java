@@ -7,32 +7,26 @@ import shared.model.ServerReference;
 
 public abstract class AbstractClient extends Thread{
 	
-	private ServerReference serverInfo;
+	public AbstractClient( ) {
 	
-	public AbstractClient( ServerReference serverInfo ) {
-		this.serverInfo = serverInfo;
 	}
 	
-	public AbstractClient( String host , int port ) {
-		this.serverInfo = new ServerReference(host,port);
-	}
-	
-	public static Socket attemptConnection( ServerReference server ) {
+	public void tryConnect( ServerReference server ) {
 		Socket socket = null;
 		try {
 			socket = new Socket( server.getAddress() , server.getPort() );
+			this.onConnect(socket , server );
 		} catch (IOException e) {
-			e.printStackTrace();
+			this.onFailed(server , e);
 		}
-		return socket;
 	}
 	
 	@Override
 	public void run() {
-		Socket socket = AbstractClient.attemptConnection(this.serverInfo);
-		this.onConnect(socket);
+		this.onRun();
 	}
 	
-	public abstract void onConnect( Socket socket );
-	
+	public abstract void onRun();
+	public abstract void onConnect( Socket socket , ServerReference info );
+	public abstract void onFailed( ServerReference server , IOException e );
 }

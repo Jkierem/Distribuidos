@@ -1,20 +1,20 @@
-package dns;
+package dpd;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import dns.services.DNSRegister;
-import dns.services.DNSService;
+import dpd.services.DPDRegister;
+import dpd.services.DPDService;
 import shared.model.ServerReference;
 
-public class DNSRunner {
+public class DPDRunner {
 
 	public static void main(String[] args) {
 		int registryPort = 7777;
 		int servicePort = 7778;
 		BlockingQueue<ServerReference> proxyList = new LinkedBlockingQueue<>(10);
-		DNSRegister<BlockingQueue<ServerReference>> registry = new DNSRegister<>("Registry", registryPort, proxyList, true);
-		DNSService<BlockingQueue<ServerReference>> service = new DNSService<>("Service" , servicePort, proxyList, true);
+		DPDRegister<BlockingQueue<ServerReference>> registry = new DPDRegister<>("Registry", registryPort, proxyList, true);
+		DPDService<BlockingQueue<ServerReference>> service = new DPDService<>("Service" , servicePort, proxyList, true);
 		registry.start();
 		service.start();
 	}

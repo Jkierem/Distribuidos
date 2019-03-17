@@ -1,4 +1,4 @@
-package dns.connection;
+package dpd.connection;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

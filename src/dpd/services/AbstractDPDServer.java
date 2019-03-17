@@ -1,4 +1,4 @@
-package dns.services;
+package dpd.services;
 
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
@@ -7,16 +7,16 @@ import shared.logic.AbstractConnection;
 import shared.logic.AbstractServer;
 import shared.model.ServerReference;
 
-public abstract class AbstractDNSService<ConnectionType extends AbstractConnection, Container extends BlockingQueue<ServerReference>> extends AbstractServer{
+public abstract class AbstractDPDServer<ConnectionType extends AbstractConnection, Container extends BlockingQueue<ServerReference>> extends AbstractServer{
 	
 	private Container proxyRefs;
 	
-	public AbstractDNSService(String name, int port, Container proxyRefs, boolean verbose) {
+	public AbstractDPDServer(String name, int port, Container proxyRefs, boolean verbose) {
 		super(name, port, verbose);
 		this.proxyRefs = proxyRefs;
 	}
 
-	public AbstractDNSService(String name, int port, Container proxyRefs) {
+	public AbstractDPDServer(String name, int port, Container proxyRefs) {
 		super(name, port);
 		this.proxyRefs = proxyRefs;
 	}
