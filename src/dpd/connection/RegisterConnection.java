@@ -4,10 +4,10 @@ import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 
-import shared.logic.AbstractConnection;
+import shared.logic.AbstractStringConnection;
 import shared.model.ServerReference;
 
-public class RegisterConnection<Container extends BlockingQueue<ServerReference>> extends AbstractConnection {
+public class RegisterConnection<Container extends BlockingQueue<ServerReference>> extends AbstractStringConnection {
 	
 	private Container proxyList;
 	
@@ -22,7 +22,6 @@ public class RegisterConnection<Container extends BlockingQueue<ServerReference>
 		try {
 			this.proxyList.put(ServerReference.fromCSVString(msg));
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		super.close();

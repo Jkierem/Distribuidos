@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 
-import shared.logic.AbstractConnection;
+import shared.logic.AbstractStringConnection;
+import shared.model.Operation;
 import shared.model.Credentials;
 import shared.model.Result;
 import shared.utils.ConditionalLogger;
 
-public class AuthConnection extends AbstractConnection {
+public class AuthConnection extends AbstractStringConnection {
 	
 	private ConcurrentHashMap<String, String> userList;
 	private ConditionalLogger logger;
@@ -23,15 +24,24 @@ public class AuthConnection extends AbstractConnection {
 	
 	@Override
 	public void onReceive(String msg, DataOutputStream out) {
+		String[] tokens = msg.split(":");
+		Operation operation = Operation.fromString(tokens[0]);
+		String data = tokens[1];
+		if( operation == Operation.AUTH ) {
+			this.onReceiveAuthOperation(data, out);
+		}
+	}
+	
+	private void onReceiveAuthOperation(String data , DataOutputStream out) {
 		Result result = null;
-		Credentials creds = Credentials.fromCSVString(msg);
+		Credentials creds = Credentials.fromCSVString(data);
 		String user = creds.getUser();
 		String password = creds.getPassword();
 		if( this.userList.containsKey(user) ) {
 			if( this.userList.get(user).compareTo(password) == 0 ) {
 				result = Result.SUCCESS;
 			} else {
-				this.logger.log("Attemptedto login with '"+user+"' Password does not match");
+				this.logger.log("Attempted to login with '"+user+"' Passwords don't match");
 				result = Result.FAILURE;
 			}
 		} else {

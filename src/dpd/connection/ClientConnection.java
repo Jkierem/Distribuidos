@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 
-import shared.logic.AbstractConnection;
+import shared.logic.AbstractStringConnection;
 import shared.model.ServerReference;
 
-public class ClientConnection<Container extends BlockingQueue<ServerReference>> extends AbstractConnection {
+public class ClientConnection<Container extends BlockingQueue<ServerReference>> extends AbstractStringConnection {
 	
 	private Container proxyList; 
 	

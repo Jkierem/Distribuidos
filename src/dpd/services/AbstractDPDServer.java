@@ -3,11 +3,11 @@ package dpd.services;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 
-import shared.logic.AbstractConnection;
 import shared.logic.AbstractServer;
+import shared.logic.AbstractStringConnection;
 import shared.model.ServerReference;
 
-public abstract class AbstractDPDServer<ConnectionType extends AbstractConnection, Container extends BlockingQueue<ServerReference>> extends AbstractServer{
+public abstract class AbstractDPDServer<ConnectionType extends AbstractStringConnection, Container extends BlockingQueue<ServerReference>> extends AbstractServer{
 	
 	private Container proxyRefs;
 	

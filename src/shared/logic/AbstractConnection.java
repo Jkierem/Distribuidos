@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public abstract class AbstractConnection extends Thread {
+public abstract class AbstractConnection<T> extends Thread {
 	private Socket socket;
 	private volatile boolean open;
 	
@@ -39,7 +39,7 @@ public abstract class AbstractConnection extends Thread {
 	
 	public void afterConnect( DataInputStream in , DataOutputStream out ) throws IOException {
 		while(this.open) {
-			String msg = in.readUTF();
+			T msg = this.listen(in, out);
 			this.onReceive(msg, out);
 		}
 	}
@@ -48,6 +48,8 @@ public abstract class AbstractConnection extends Thread {
 		this.open = false;
 	}
 	
-	public void onReceive( String msg , DataOutputStream out ) {}
+	public abstract T listen( DataInputStream in , DataOutputStream out ) throws IOException;
+	
+	public void onReceive( T msg , DataOutputStream out ) {}
 	public void onConnect( DataInputStream in , DataOutputStream out ) {}
 }

@@ -43,4 +43,7 @@ public class Credentials {
 				.setUser(tokens[0])
 				.setPassword(tokens[1]);
 	}
+	public String toAuthMessage( ) {
+		return Operation.AUTH.toString()+":"+this.toCSVString();
+	}
 }
