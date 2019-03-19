@@ -7,11 +7,15 @@ import shared.model.ServerReference;
 public class ConsumerRunner {
 
 	public static void main(String[] args) {
-		ServerReference authRef = new ServerReference("localhost", 8001);
-		ServerReference dnsRef = new ServerReference("localhost",7778);
-		Scanner in = new Scanner(System.in);
-		Consumer client = new Consumer(1,authRef,dnsRef,in);
-		client.start();
+		if( args[0].equals("help") ) {
+			System.out.println("Usage: Client <authHost>:<authPort> <dpdHost>:<dpdServicePort>");
+		} else {			
+			ServerReference authRef = new ServerReference(args[0]);
+			ServerReference dnsRef = new ServerReference(args[1]);
+			Scanner in = new Scanner(System.in);
+			Consumer client = new Consumer(1,authRef,dnsRef,in);
+			client.start();
+		}
 	}
 
 }

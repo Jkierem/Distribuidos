@@ -43,11 +43,19 @@ public class SourceConnection extends AbstractConnection<String> {
 		Vote v = Vote.fromCSVString(data);
 		boolean success = false;
 		for( Proposal p : this.activeProposals ) {
-			if( p.getName().compareTo(v.getId()) == 0 ){
+			if( p.getName().compareTo(v.getTopic()) == 0 ){
 				success = p.receiveVote(v);
 			}
 		}
 		return success ? Result.SUCCESS : Result.FAILURE;
+	}
+	
+	public void reportVotes() {
+		String props = "Proposals: \n";
+		for( Proposal p : this.activeProposals ) {
+			props += p.toString() + "\n";
+		}
+		System.out.println(props);
 	}
 	
 	@Override
@@ -57,6 +65,7 @@ public class SourceConnection extends AbstractConnection<String> {
 		Result res = Result.SUCCESS;
 		if( op == Operation.VOTE ) {
 			res = this.processVote(tokens[1]);
+			this.reportVotes();
 		}
 		this.sendProposalList(res,out);
 		super.close();

@@ -87,7 +87,7 @@ public class Consumer extends AbstractClient {
 		Transition<Consumer> retryFail = new Transition<>( x -> x.retries <= 0 );
 		Transition<Consumer> success = new Transition<>( x -> true );
 		Effect<Consumer> endExecution = x -> {
-			x.logger.log("Could not connect. Please restart client.");
+			x.logger.log("Finished execution");
 			x.state = State.END; 
 		};
 		
@@ -99,6 +99,7 @@ public class Consumer extends AbstractClient {
 		
 		Transition<Consumer> proxySuccess = success
 				.setCondition( x -> x.dpdConnect == true )
+				//.setEffect(endExecution);
 				.setEffect(this.createStateChange(State.VOTING));
 		Transition<Consumer> proxyFail = retryFail
 				.setEffect(endExecution);
@@ -269,15 +270,22 @@ public class Consumer extends AbstractClient {
 			out.writeUTF(Operation.LIST.toString()+ ":please");
 			String reply = in.readUTF();
 			String[] tokens = reply.split(":");
-			String[] data = tokens[1].split(",");
+			String[] data = {""};
+			try {				
+				data = tokens[1].split(",");
+			} catch (IndexOutOfBoundsException e) {
+				e.printStackTrace();
+			}
 			String topic = this.askForPetition(data);
 			ApprovalRate ar = this.askForApproval();
 			Vote vote = new Vote(this.userId, topic, ar);
+			this.logger.log(vote.toVoteMessage());
 			out.writeUTF(vote.toVoteMessage());
 			String res = in.readUTF();
-			this.logger.log(res);
-			this.state = State.END;
+			this.logger.log(res.split(":")[0]);
+			this.proxyConnect = true;
 		} catch (IOException e) {
+			e.printStackTrace();
 			this.state = State.ASKING_FOR_PROXY;
 		}
 	}

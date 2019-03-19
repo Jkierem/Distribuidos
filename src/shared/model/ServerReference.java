@@ -4,6 +4,12 @@ public class ServerReference {
 	private String address;
 	private int port;
 	
+	public ServerReference(String socketStr) {
+		String[] tokens = socketStr.split(":");
+		this.address = tokens[0];
+		this.port = Integer.parseInt(tokens[1]);
+	}
+	
 	public ServerReference(String address, int port) {
 		this.address = address;
 		this.port = port;

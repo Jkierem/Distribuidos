@@ -30,7 +30,7 @@ public abstract class AbstractServer extends Thread {
 		try {
 			server = new ServerSocket(this.port);
 			while(this.open) {
-				this.logger.log("Waiting for connections...");
+				this.logger.log("Waiting for connections on port "+ String.valueOf(this.port) +"...");
 				Socket socket = server.accept();
 				this.logger.log("Got connection! About to communicate");
 				this.onRequest(socket);

@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import shared.logic.AbstractStringConnection;
 import shared.model.Operation;
+import shared.model.Result;
 import shared.model.ServerReference;
 import shared.model.Vote;
 
@@ -35,7 +36,6 @@ public class ProxyConnection extends AbstractStringConnection {
 				this.onPing(out);
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -56,9 +56,10 @@ public class ProxyConnection extends AbstractStringConnection {
 	public void onList( DataOutputStream out ) throws IOException {
 		String topics = "";
 		for( String topic : this.directory.keySet() ) {
-			topics+=topic;
+			String pre = topics.length() > 0 ? "," : "";
+			topics += pre + topic;
 		}
-		out.writeUTF(topics);
+		out.writeUTF(Result.SUCCESS.toString() + ":" + topics);
 	}
 	
 	public void onPing( DataOutputStream out ) throws IOException {

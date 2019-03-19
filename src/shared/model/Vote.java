@@ -13,7 +13,7 @@ public class Vote {
 	}
 	
 	public String toCSVString() {
-		return this.topic + "," + this.id + "," + this.approvalRate.toString();
+		return this.id + "," + this.topic + "," + this.approvalRate.toString();
 	}
 	
 	public static Vote fromCSVString(String csv) {

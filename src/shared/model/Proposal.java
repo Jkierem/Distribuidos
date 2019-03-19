@@ -25,7 +25,9 @@ public class Proposal {
 	private boolean hasVoted( String name ) {
 		boolean has = false;
 		for( String voter : this.voters ) {
-			has = has || voter.equals(name);
+			if( voter.compareTo(name) == 0) {
+				has = true;
+			}
 		}
 		return has;
 	}
@@ -37,14 +39,17 @@ public class Proposal {
 			case LOW:
 				result = true;
 				this.state[0]++;
+				this.voters.add(v.getId());
 				break;
 			case MEDIUM:
 				result = true;
 				this.state[1]++;
+				this.voters.add(v.getId());
 				break;
 			case HIGH:
 				result = true;
 				this.state[2]++;
+				this.voters.add(v.getId());
 				break;
 			default:
 				break;
@@ -67,6 +72,13 @@ public class Proposal {
 	
 	public String getName() {
 		return this.name;
+	}
+	
+	public String toString() {
+		return this.name + ":\n" 
+					+ " - Low: " + String.valueOf(this.getLow()) + "\n"
+					+ " - Medium: " + String.valueOf(this.getMedium()) + "\n"
+					+ " - High: " + String.valueOf(this.getHigh()) + "\n";
 	}
 
 }

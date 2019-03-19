@@ -28,7 +28,7 @@ public class ProxyServer extends Thread {
 		this.dpdServer = dnsReference;
 		this.logger = new ConditionalLogger(false);
 		this.sources = sources;
-		this.cacheDuration = 1;
+		this.cacheDuration = 30000;
 		this.directory = new ConcurrentHashMap<String, ServerReference>();
 	}
 	
@@ -37,7 +37,7 @@ public class ProxyServer extends Thread {
 		this.dpdServer = dnsReference;
 		this.sources = sources;
 		this.logger = new ConditionalLogger(verbose, "ProxyServer: ");
-		this.cacheDuration = 1;
+		this.cacheDuration = 30000;
 		this.directory = new ConcurrentHashMap<String, ServerReference>();
 	}
 	
@@ -67,7 +67,7 @@ public class ProxyServer extends Thread {
 		long ellapsed = 0;
 		while(true) {
 			Instant after = Instant.now();
-			ellapsed = Duration.between(before, after).toMinutes();
+			ellapsed = Duration.between(before, after).toMillis();
 			if( ellapsed > cacheDuration ) {
 				this.getInfoSources();
 				before = after;
