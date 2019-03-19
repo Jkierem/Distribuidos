@@ -9,9 +9,12 @@ import java.util.Scanner;
 import shared.functional.Effect;
 import shared.functional.Transition;
 import shared.logic.AbstractClient;
+import shared.model.ApprovalRate;
 import shared.model.Credentials;
+import shared.model.Operation;
 import shared.model.Result;
 import shared.model.ServerReference;
+import shared.model.Vote;
 import shared.utils.ConditionalLogger;
 
 public class Consumer extends AbstractClient {
@@ -150,12 +153,16 @@ public class Consumer extends AbstractClient {
 	
 	@Override
 	public void onConnect(Socket socket, ServerReference info) {
-		if( info.equals(this.auth) ) {
-			this.onConnectToAuth(socket);
-		} else if( info.equals(this.dpd) ) {
-			this.onConnectToDPD(socket);
-		} else if( info.equals(this.proxy) ) {
-			this.onConnectToProxy(socket);
+		try {
+			if( info.equals(this.auth) ) {
+				this.onConnectToAuth(socket);
+			} else if( info.equals(this.dpd) ) {
+				this.onConnectToDPD(socket);
+			} else if( info.equals(this.proxy) ) {
+				this.onConnectToProxy(socket);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -204,9 +211,75 @@ public class Consumer extends AbstractClient {
 		}
 	}
 	
+	public String askForPetition( String[] data ) {
+		int chosen = -1;
+		boolean chose = false;
+		String pList = "";
+		for( int i = 0 ; i< data.length ; i++ ) {
+			pList += String.valueOf(i) + " - " + data[i] + "\n";
+		}
+		while( !chose ) {
+			this.logger.log("Choose one of the following by the number: \n" + pList);
+			String in = this.input.nextLine();
+			int index = Integer.parseInt(in);
+			boolean exists = index >= 0 && index < data.length;
+			if( exists ) {
+				chosen = index;
+				chose = true;
+			} else {
+				this.logger.log("Please choose a valid one");
+			}
+		}
+		return data[chosen];
+	}
+	
+	public ApprovalRate askForApproval() {
+		ApprovalRate res = ApprovalRate.NONE;
+		boolean chosen = false;
+		while(!chosen) {
+			this.logger.log("Choose an approval rate from the number: \n"
+					+ "0 - Low\n" + "1 - Medium\n" + "2 - High\n");
+			String in = this.input.nextLine();
+			int value = Integer.parseInt(in);
+			switch (value) {
+			case 0:
+				res = ApprovalRate.LOW;
+				chosen = true;
+				break;
+			case 1:
+				res = ApprovalRate.MEDIUM;
+				chosen = true;
+				break;
+			case 2:
+				res = ApprovalRate.HIGH;
+				chosen = true;
+				break;
+			default:
+				this.logger.log("Choose a valid value\n");
+				break;
+			}
+		}
+		return res;
+	}
+	
 	public void onConnectToProxy(Socket socket) {
-		this.logger.log(this.userId);
-		//TODO: Implement this
+		try {
+			DataInputStream in = new DataInputStream(socket.getInputStream());
+			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+			out.writeUTF(Operation.LIST.toString()+ ":please");
+			String reply = in.readUTF();
+			String[] tokens = reply.split(":");
+			String[] data = tokens[1].split(",");
+			String topic = this.askForPetition(data);
+			ApprovalRate ar = this.askForApproval();
+			Vote vote = new Vote(this.userId, topic, ar);
+			out.writeUTF(vote.toVoteMessage());
+			String res = in.readUTF();
+			this.logger.log(res);
+			this.state = State.END;
+		} catch (IOException e) {
+			this.state = State.ASKING_FOR_PROXY;
+		}
 	}
 
 }

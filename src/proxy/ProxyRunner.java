@@ -1,6 +1,7 @@
 package proxy;
 
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 import shared.model.ServerReference;
 
@@ -10,26 +11,16 @@ public class ProxyRunner {
 		String localAddress = "localhost";
 		String dnsAddress = "localhost";
 		int dnsRegistryPort = 7777;
-		int proxyMaxCount = 10;
-		int proxyCount = 0;
 		int currentProxyPort = 7000;
-		String input = "valid";
-		Scanner in = null;
-		in = new Scanner(System.in);
-		while( input.compareTo("exit") != 0 ) {
-			input = in.nextLine();
-			if( input.compareTo("create") == 0 ) {
-				if( proxyCount < proxyMaxCount ) {					
-					new ProxyServer( 
-							new ServerReference( localAddress , currentProxyPort) ,
-							new ServerReference( dnsAddress , dnsRegistryPort)
-						).start();
-					proxyCount++;
-					currentProxyPort++;
-				} 
-			}
-		}
-		in.close();
+		List<ServerReference> sources = new ArrayList<>();
+		sources.add(new ServerReference("localhost", 60100));
+		//sources.add(new ServerReference("localhost", 60101));
+		//sources.add(new ServerReference("localhost", 60102));
+		new ProxyServer( 
+				new ServerReference( localAddress , currentProxyPort) ,
+				new ServerReference( dnsAddress , dnsRegistryPort),
+				sources, true
+		).start();
 	}
 
 }

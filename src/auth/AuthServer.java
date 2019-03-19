@@ -1,11 +1,12 @@
 package auth;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import shared.logic.AbstractServer;
+import shared.utils.CSVReader;
 
 public class AuthServer extends AbstractServer{
 	
@@ -13,21 +14,23 @@ public class AuthServer extends AbstractServer{
 	
 	public AuthServer( String path, int port, boolean verbose) throws IOException{
 		super("Auth", port, verbose);
-		FileHandler fh = this.createHandler(path);
-		this.userList = fh.readUsers();
+		this.userList = this.readFile(path);
 		this.report();
 	}
 	
 	public AuthServer( String path, int port ) throws IOException {
 		super("Auth", port, false);
-		FileHandler fh = this.createHandler(path);
-		this.userList = fh.readUsers();
+		this.userList = this.readFile(path);
 		this.report();
 	}
 	
-	private FileHandler createHandler( String path ) throws FileNotFoundException {
-		FileHandler fh =  new FileHandler(path);
-		return fh;
+	private ConcurrentHashMap<String, String> readFile(String path) throws IOException{
+		ConcurrentHashMap<String, String> map = new ConcurrentHashMap<String, String>();
+		List<String[]> users = new CSVReader(path).readFile();
+		for( String[] tuple : users ) {
+			map.put(tuple[0], tuple[1]);
+		}
+		return map;
 	}
 	
 	public void report() {

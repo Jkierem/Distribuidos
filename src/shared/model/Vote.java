@@ -44,5 +44,15 @@ public class Vote {
 		return approvalRate;
 	}
 	
+	public int compare(Vote v) {
+		return id.compareTo(v.id) + topic.compareTo(v.topic) + (approvalRate.getValue() - v.approvalRate.getValue());
+	}
 	
+	public boolean equals(Vote v) {
+		return this.compare(v) == 0;
+	}
+	
+	public boolean isEmpty() {
+		return this.equals(Vote.empty());
+	}
 }

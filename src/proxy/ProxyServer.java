@@ -1,12 +1,16 @@
 package proxy;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import shared.model.Operation;
 import shared.model.ServerReference;
 import shared.utils.ConditionalLogger;
 
@@ -16,28 +20,49 @@ public class ProxyServer extends Thread {
 	private ServerReference dpdServer;
 	private ConditionalLogger logger;
 	private volatile ConcurrentHashMap<String, ServerReference> directory;
-	private long cacheDuration;
+	private List<ServerReference> sources;
+ 	private long cacheDuration;
 	
-	public ProxyServer( ServerReference info, ServerReference dnsReference) {
+	public ProxyServer( ServerReference info, ServerReference dnsReference, List<ServerReference> sources) {
 		this.info = info;
 		this.dpdServer = dnsReference;
 		this.logger = new ConditionalLogger(false);
-		this.cacheDuration = 2;
-	}
-	
-	public ProxyServer( ServerReference info, ServerReference dnsReference, boolean verbose) {
-		this.info = info;
-		this.dpdServer = dnsReference;
-		this.logger = new ConditionalLogger(verbose);
-		this.cacheDuration = 2;
-	}
-	
-	public void getInfoSources(){
-		//TODO : Implement this
+		this.sources = sources;
+		this.cacheDuration = 1;
 		this.directory = new ConcurrentHashMap<String, ServerReference>();
 	}
 	
-	public void maintainTopicCache() {
+	public ProxyServer( ServerReference info, ServerReference dnsReference , List<ServerReference> sources, boolean verbose) {
+		this.info = info;
+		this.dpdServer = dnsReference;
+		this.sources = sources;
+		this.logger = new ConditionalLogger(verbose, "ProxyServer: ");
+		this.cacheDuration = 1;
+		this.directory = new ConcurrentHashMap<String, ServerReference>();
+	}
+	
+	public void getInfoSources() throws UnknownHostException, IOException{
+		this.logger.log("Filling cache...");
+		for( ServerReference server : this.sources ) {
+			Socket socket = new Socket( server.getAddress() , server.getPort() );
+			DataInputStream in = new DataInputStream( socket.getInputStream() );
+			DataOutputStream out = new DataOutputStream( socket.getOutputStream() );
+			out.writeUTF(Operation.LIST.toString());
+			String[] tokens = in.readUTF().split(":");
+			String petitions = tokens.length > 1 ? tokens[1]: "";
+			for( String p : petitions.split(",") ) {
+				this.directory.put(p, server);
+			}
+			socket.close();
+		}
+		String petitions = "";
+		for( String key : this.directory.keySet() ) {
+			petitions += "- " + key + "\n";
+		}
+		this.logger.log("Active petitions: \n"+ petitions);
+	}
+	
+	public void maintainTopicCache() throws UnknownHostException, IOException {
 		Instant before = Instant.now();
 		long ellapsed = 0;
 		while(true) {

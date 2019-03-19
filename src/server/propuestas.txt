@@ -1,0 +1,3 @@
+puente,1
+carretera,1
+basurero,1
